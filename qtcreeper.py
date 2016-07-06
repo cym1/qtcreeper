@@ -7,10 +7,10 @@
 
 def show_exception_and_exit(exc_type, exc_value, tb):
 	if exc_type != KeyboardInterrupt:
-		print "*** ERROR ***\n"
+		print("*** ERROR ***\n")
 		import traceback
 		traceback.print_exception(exc_type, exc_value, tb)
-		raw_input("\nPress enter to exit.")
+		input("\nPress enter to exit.")
 		sys.exit(-1)
 
 import sys
@@ -69,10 +69,10 @@ if not os.path.exists(DATA_DIR):
 
 
 def get_number(promptText, default = None):
-	print promptText
+	print(promptText)
 	
 	while True:
-		i = raw_input("> ")
+		i = input("> ")
 		
 		try:
 			r = int(i)
@@ -83,27 +83,27 @@ def get_number(promptText, default = None):
 		if default != None and i == "":
 			return default
 		else:
-			print "Invalid selection, try again!"
+			print("Invalid selection, try again!")
 
 def get_number_from_list(promptText, allowedOptions):
-	print promptText
+	print(promptText)
 	
 	while True:
 		try:
-			r = int(raw_input("> "))
+			r = int(input("> "))
 			
 			if r in allowedOptions:
 				return r
 		except ValueError:
 			pass
 		
-		print "Invalid selection, try again!"
+		print("Invalid selection, try again!")
 
 def get_iso_codes(promptText, allowedOptions = None):
-	print promptText
+	print(promptText)
 	
 	while True:
-		r = raw_input("> ")
+		r = input("> ")
 		
 		if r == "":
 			return []
@@ -121,12 +121,12 @@ def get_iso_codes(promptText, allowedOptions = None):
 		if not fail:
 			return isoCodes
 		
-		print "Input invalid, try again!"
+		print("Input invalid, try again!")
 
 def get_word_list(promptText):
-	print promptText
+	print(promptText)
 	
-	r = raw_input("> ")
+	r = input("> ")
 	
 	if r == "":
 		return []
@@ -137,16 +137,16 @@ def get_word_list(promptText):
 
 config = {}
 
-print "Welcome to qtcreeper!"
-print "--> https://github.com/anonimousse12345/qtcreeper"
-print "User settings will be saved in: " + DATA_DIR
+print("Welcome to qtcreeper!")
+print("--> https://github.com/anonimousse12345/qtcreeper")
+print("User settings will be saved in: " + DATA_DIR)
 
 if os.path.exists(CONFIG_FILE):
 	with open(CONFIG_FILE, "r") as f:
 		config = json.loads(f.read())
 	
 	# Ensure any later added default keys exist
-	for k, v in DEFAULT_CONFIG.iteritems():
+	for k, v in DEFAULT_CONFIG.items():
 		if not k in config:
 			config[k] = v
 else:
@@ -177,10 +177,10 @@ while True:
 		,[1,2,3,4,5,6,7,8,9])
 
 	if command == 1:
-		print "\nEnter username or email address:"
-		config["email"] = raw_input("> ").strip().lower()
-		print "\nEnter password:"
-		config["password"] = raw_input("> ")
+		print("\nEnter username or email address:")
+		config["email"] = input("> ").strip().lower()
+		print("\nEnter password:")
+		config["password"] = input("> ")
 
 	elif command == 2:
 		# Get genders
@@ -210,7 +210,7 @@ while True:
 	elif command == 6:
 		# Set creep speed
 		config["creepspeed"] = get_number_from_list("\nEnter a speed between 1 and 10 (1 = slow and realistic, 10 = stupid fast):",
-			range(1,11))
+			list(range(1,11)))
 	
 	elif command == 7:
 		# Set max creep
@@ -226,16 +226,16 @@ while True:
 	
 	elif command == 9:
 		if config["email"] == "" or config["password"] == "":
-			print "\nSet email and password first!"
+			print("\nSet email and password first!")
 		else:
-			print "\nRunning creeper..."
+			print("\nRunning creeper...")
 			break
 	
 	# Save any changes
 	with open(CONFIG_FILE, "w") as f:
 		f.write( json.dumps(config, indent=4) )
 	
-	print "\n* Changes saved..."
+	print("\n* Changes saved...")
 
 
 # File to log users already visited
@@ -254,14 +254,14 @@ def record_user_visited(username):
 # Short pause between regular pageloads
 def default_wait():
 	if config["creepspeed"] < 10: # don't wait at all at highest speed
-		print "\nWaiting..."
+		print("\nWaiting...")
 		time.sleep(random.uniform(5,10) / config["creepspeed"])
 
 # Longer(?) pause between user views
 def user_view_wait():
 	if config["creepspeed"] < 10: # don't wait at all at highest speed
 		sleepTime = random.uniform(5,15) / config["creepspeed"]
-		print "\nWaiting %f seconds..." % sleepTime
+		print("\nWaiting %f seconds..." % sleepTime)
 		time.sleep(sleepTime)
 
 
@@ -270,18 +270,18 @@ client = requests.Session()
 client.headers["Host"] = "www.interpals.net"
 client.headers["User-Agent"] = config["useragent"]
 
-print "\nVisiting main page..."
+print("\nVisiting main page...")
 
 r = client.get("https://www.interpals.net/")
 client.headers["Referer"] = "https://www.interpals.net/"
 
 csrf_token = re.findall(r'<meta name="csrf-token" content="([^"]+)"', r.text, re.M)[0]
 
-print "\n* Got CSRF Token: %s" % csrf_token
+print("\n* Got CSRF Token: %s" % csrf_token)
 
 default_wait()
 
-print "\nAttempting login..."
+print("\nAttempting login...")
 
 params = {
 	"username": config["email"],
@@ -296,18 +296,18 @@ client.headers["Referer"] = "https://www.interpals.net/account.php"
 #print "\n", r.request.headers
 
 if r.text.find("My Profile") == -1:
-    print "\nError: login failed. Either email/password incorrect or qtcreeper needs updating."
+    print("\nError: login failed. Either email/password incorrect or qtcreeper needs updating.")
     
     #with open("debug.txt", "w") as f:
 	#	f.write(r.text)
     
     exit(1)
 else:
-    print "\n* Successfully logged in!"
+    print("\n* Successfully logged in!")
 
 default_wait()
 
-print "\nVisiting search page..."
+print("\nVisiting search page...")
 r = client.get("https://www.interpals.net/app/search")
 client.headers["Referer"] = "https://www.interpals.net/app/search"
 
@@ -368,22 +368,22 @@ while True:
 	# Query search page
 	
 	userSearchUrl = build_search_url(max(0,currentSearchPage-1), currentSearchPage, onlineOnly)
-	print "\nQuerying search page %d using search URL: %s" % (currentSearchPage, userSearchUrl)
+	print("\nQuerying search page %d using search URL: %s" % (currentSearchPage, userSearchUrl))
 	
 	r = client.get(userSearchUrl)
 	client.headers["Referer"] = userSearchUrl
 	
 	# Extract usernames
 	usernames = re.findall(r'Report ([a-zA-Z0-9\-_]+) to moderators', r.text, re.M)
-	print "\nFound %d users on search page %d." % (len(usernames), currentSearchPage)
+	print("\nFound %d users on search page %d." % (len(usernames), currentSearchPage))
 	
 	default_wait()
 	
 	# No users were found?
 	if len(usernames) == 0:
-		print "\n!!!!!!! NO MORE USERS FOUND !!!!!!!"
-		print "\nMay have reached end of users. Will now start again including offline users in search."
-		print "\n(Otherwise, try using broader search terms.)"
+		print("\n!!!!!!! NO MORE USERS FOUND !!!!!!!")
+		print("\nMay have reached end of users. Will now start again including offline users in search.")
+		print("\n(Otherwise, try using broader search terms.)")
 		currentSearchPage = 0
 		onlineOnly = False
 		ranOutOfUsers = True
@@ -396,7 +396,7 @@ while True:
 	
 	for username in usernames:
 		if username not in usersVisited:
-			print "\nVisiting user %s" % username
+			print("\nVisiting user %s" % username)
 			client.get("https://www.interpals.net/" + username)
 			
 			record_user_visited(username)
@@ -408,21 +408,21 @@ while True:
 			
 			user_view_wait()
 		else:
-			print "\nAlready visited user %s, skipping..." % username
+			print("\nAlready visited user %s, skipping..." % username)
 			skippedCount += 1
 			totalSkippedCount += 1
 	
-	print "\n*** RESULTS SO FAR ***\n"
-	print " Search page #%d" % currentSearchPage
-	print " Visited %d new users this page, %d were already visited." % (viewedCount, skippedCount)
-	print " Visited %d new users in total, %d were already visited." % (totalViewedCount, totalSkippedCount)
+	print("\n*** RESULTS SO FAR ***\n")
+	print(" Search page #%d" % currentSearchPage)
+	print(" Visited %d new users this page, %d were already visited." % (viewedCount, skippedCount))
+	print(" Visited %d new users in total, %d were already visited." % (totalViewedCount, totalSkippedCount))
 	
 	if ranOutOfUsers:
-		print "\n!!! WARNING: At one point the script ran out of online users, and started including offline users."
+		print("\n!!! WARNING: At one point the script ran out of online users, and started including offline users.")
 	
 	if config["maxcreep"] > 0 and totalViewedCount >= config["maxcreep"]:
-		print "\n* Reached qt maximum creep limit %d, shutting down..." % config["maxcreep"]
-		raw_input("\nPress enter to exit.")
+		print("\n* Reached qt maximum creep limit %d, shutting down..." % config["maxcreep"])
+		input("\nPress enter to exit.")
 		exit(0)
 	
 	# Next page of search
